@@ -9,131 +9,188 @@ from Data.masterdata import health_institution, financial_institution
 def createTable():
     Create_table_query="""
          CREATE TABLE  if not exists HealthInstitution (
-          HealthInstitutionID bigint primary key generated always as identity,
-          HealthInstitutionName text NOT NULL,
-          HealthInstitutionDesc text NOT NULL,
-          HealthInstitutionEmailAddress text NOT NULL,
-          HealthInstitutionOpenTime text NOT NULL,
-          HealthInstitutionType text NOT NULL,
-          HealthInstitutionAddress text NOT NULL,
-          HealthInstitutionAddressLong float NOT NULL,
-          HealthInstitutionAddressLat float NOT NULL,
-          created_at timestamp with time zone DEFAULT now(),
-          updated_at timestamp
-         );
-         
-         CREATE TABLE  if not exists HealthInstitutionService (
-          HealthInstitutionServiceID bigint primary key generated always as identity,
-          HealthInstitutionServiceName text NOT NULL,
-          HealthInstitutionServiceDesc text NOT NULL,
-          HealthInstitutionID bigint NOT NULL,
-          created_at timestamp with time zone DEFAULT now(),
-          updated_at timestamp
-         );
-         
-         CREATE TABLE  if not exists HealthInstitutionAcreditedInsurance (
-          HealthInstitutionAcreditedInsuranceID bigint primary key generated always as identity,
-          HealthInstitutionAcreditedInsuranceName text NOT NULL,
-          HealthInstitutionAcreditedInsuranceDesc text NOT NULL,
-          HealthInstitutionID bigint NOT NULL,
-          created_at timestamp with time zone DEFAULT now(),
-          updated_at timestamp
-         );
-         
-         CREATE TABLE if not exists FinancialInstitution (
-          FinancialInstitutionID bigint primary key generated always as identity,
-          FinancialInstitutionName text NOT NULL,
-          FinancialInstitutionDesc text NOT NULL,
-          FinancialInstitutionEmailAddress text NOT NULL,
-          FinancialInstitutionOpenTime text NOT NULL,
-          FinancialInstitutionType text NOT NULL,
-          FinancialInstitutionAddress text NOT NULL,
-          FinancialInstitutionAddressLong float,
-          FinancialInstitutionAddressLat float,
-          created_at timestamp with time zone DEFAULT now(),
-          updated_at timestamp
+            HealthInstitutionID bigint primary key generated always as identity,
+            HealthInstitutionName text NOT NULL,
+            HealthInstitutionDesc text NOT NULL,
+            HealthInstitutionEmailAddress text NOT NULL,
+            HealthInstitutionOpenTime text NOT NULL,
+            HealthInstitutionCloseTime text NOT NULL,
+            HealthInstitutionType text NOT NULL,
+            HealthInstitutionAddress text NOT NULL,
+            HealthInstitutionAddressLong float NOT NULL,
+            HealthInstitutionAddressLat float NOT NULL,
+            created_at timestamp with time zone DEFAULT now(),
+            updated_at timestamp
         );
-        
+            
+        CREATE TABLE  if not exists HealthInstitutionService (
+            HealthInstitutionServiceID bigint primary key generated always as identity,
+            HealthInstitutionServiceName text NOT NULL,
+            HealthInstitutionServiceDesc text NOT NULL,
+            HealthInstitutionID bigint NOT NULL,
+            FOREIGN KEY (HealthInstitutionID) REFERENCES HealthInstitution(HealthInstitutionID) ON DELETE CASCADE,
+            created_at timestamp with time zone DEFAULT now(),
+            updated_at timestamp
+        );
+            
+        CREATE TABLE  if not exists HealthInstitutionAcreditedInsurance (
+            HealthInstitutionAcreditedInsuranceID bigint primary key generated always as identity,
+            HealthInstitutionAcreditedInsuranceName text NOT NULL,
+            HealthInstitutionAcreditedInsuranceDesc text NOT NULL,
+            HealthInstitutionID bigint NOT NULL,
+            FOREIGN KEY (HealthInstitutionID) REFERENCES HealthInstitution(HealthInstitutionID) ON DELETE CASCADE,
+            created_at timestamp with time zone DEFAULT now(),
+            updated_at timestamp
+        );
+            
+        CREATE TABLE if not exists FinancialInstitution (
+            FinancialInstitutionID bigint primary key generated always as identity,
+            FinancialInstitutionName text NOT NULL,
+            FinancialInstitutionDesc text NOT NULL,
+            FinancialInstitutionEmailAddress text NOT NULL,
+            FinancialInstitutionOpenTime text NOT NULL,
+            FinancialInstitutionCloseTime text NOT NULL,
+            FinancialInstitutionType text NOT NULL,
+            FinancialInstitutionAddress text NOT NULL,
+            FinancialInstitutionAddressLong float,
+            FinancialInstitutionAddressLat float,
+            created_at timestamp with time zone DEFAULT now(),
+            updated_at timestamp
+        );
+            
         CREATE TABLE if not exists FinancialInstitutionNotes (
-         FinancialInstitutionNotesID bigint primary key generated always as identity,
-         FinancialInstitutionNotesName text NOT NULL,
-         FinancialInstitutionNotesDesc text NOT NULL,
-         FinancialInstitutionID bigint NOT NULL,
-         created_at timestamp with time zone DEFAULT now(),
-         updated_at timestamp
+            FinancialInstitutionNotesID bigint primary key generated always as identity,
+            FinancialInstitutionNotesName text NOT NULL,
+            FinancialInstitutionNotesDesc text NOT NULL,
+            FinancialInstitutionID bigint NOT NULL,
+            FOREIGN KEY (FinancialInstitutionID) REFERENCES FinancialInstitution(FinancialInstitutionID) ON DELETE CASCADE,
+            created_at timestamp with time zone DEFAULT now(),
+            updated_at timestamp
         );
-        
+            
         CREATE TABLE if not exists FinancialInstitutionBenefits (
-         FinancialInstitutionBenefitsID bigint primary key generated always as identity,
-         FinancialInstitutionBenefitsName text NOT NULL,
-         FinancialInstitutionBenefitsDesc text NOT NULL,
-         FinancialInstitutionID bigint NOT NULL,
-         created_at timestamp with time zone DEFAULT now(),
-         updated_at timestamp
+            FinancialInstitutionBenefitsID bigint primary key generated always as identity,
+            FinancialInstitutionBenefitsName text NOT NULL,
+            FinancialInstitutionBenefitsDesc text NOT NULL,
+            FinancialInstitutionID bigint NOT NULL,
+            FOREIGN KEY (FinancialInstitutionID) REFERENCES FinancialInstitution(FinancialInstitutionID) ON DELETE CASCADE,
+            created_at timestamp with time zone DEFAULT now(),
+            updated_at timestamp
         );
-        
-         CREATE TABLE if not exists FinancialInstitutionProcess (
-          FinancialInstitutionProcessID bigint primary key generated always as identity,
-          FinancialInstitutionProcessDesc text NOT NULL,
-          FinancialInstitutionBenefitsID bigint NOT NULL,
-          created_at timestamp with time zone DEFAULT now(),
-          updated_at timestamp
+            
+        CREATE TABLE if not exists FinancialInstitutionProcess (
+            FinancialInstitutionProcessID bigint primary key generated always as identity,
+            FinancialInstitutionProcessDesc text NOT NULL,
+            FinancialInstitutionBenefitsID bigint NOT NULL,
+            FOREIGN KEY (FinancialInstitutionBenefitsID) REFERENCES FinancialInstitutionBenefits(FinancialInstitutionBenefitsID) ON DELETE CASCADE,
+            created_at timestamp with time zone DEFAULT now(),
+            updated_at timestamp
         );
-        
+            
         CREATE TABLE if not exists BenefitsInclusionList (
-          BenefitsInclusionListID bigint primary key generated always as identity,
-          BenefitsInclusionListTitle text NOT NULL,
-          BenefitsInclusionListDesc text NOT NULL,
-          FinancialInstitutionBenefitsID bigint NOT NULL,
-          created_at timestamp with time zone DEFAULT now(),
-          updated_at timestamp
+            BenefitsInclusionListID bigint primary key generated always as identity,
+            BenefitsInclusionListTitle text NOT NULL,
+            BenefitsInclusionListDesc text NOT NULL,
+            FinancialInstitutionBenefitsID bigint NOT NULL,
+            FOREIGN KEY (FinancialInstitutionBenefitsID) REFERENCES FinancialInstitutionBenefits(FinancialInstitutionBenefitsID) ON DELETE CASCADE,
+            created_at timestamp with time zone DEFAULT now(),
+            updated_at timestamp
         );
         
         CREATE TABLE if not exists FinancialInstitutionRequirement (
-          FinancialInstitutionRequirementID bigint primary key generated always as identity,
-          FinancialInstitutionRequirementName text NOT NULL,
-          FinancialInstitutionRequirementDesc text NOT NULL,
-          FinancialInstitutionRequirementType text NOT NULL,
-          FinancialInstitutionBenefitsID bigint NOT NULL,
-          created_at timestamp with time zone DEFAULT now(),
-          updated_at timestamp
+            FinancialInstitutionRequirementID bigint primary key generated always as identity,
+            FinancialInstitutionRequirementName text NOT NULL,
+            FinancialInstitutionRequirementDesc text NOT NULL,
+            FinancialInstitutionRequirementType text NOT NULL,
+            FinancialInstitutionBenefitsID bigint NOT NULL,
+            FOREIGN KEY (FinancialInstitutionBenefitsID) REFERENCES FinancialInstitutionBenefits(FinancialInstitutionBenefitsID) ON DELETE CASCADE,
+            created_at timestamp with time zone DEFAULT now(),
+            updated_at timestamp
         );
         
         CREATE TABLE if not exists Blogs (
-          BlogsID bigint primary key generated always as identity,
-          BlogsName text NOT NULL,
-          BlogsAuthor text NOT NULL,
-          created_at timestamp with time zone DEFAULT now(),
-          updated_at timestamp
+            BlogsID bigint primary key generated always as identity,
+            BlogsName text NOT NULL,
+            BlogsAuthor text NOT NULL,
+            created_at timestamp with time zone DEFAULT now(),
+            updated_at timestamp
         );
         
         CREATE TABLE if not exists BlogsRefLink (
-          BlogsRefLink bigint primary key generated always as identity,
-          RefLink text NOT NULL,
-          BlogsID bigint NOT NULL,
-          created_at timestamp with time zone DEFAULT now(),
-          updated_at timestamp
+            BlogsRefLinkID bigint primary key generated always as identity,
+            BlogsRefLink text NOT NULL,
+            BlogsID bigint NOT NULL,
+            FOREIGN KEY (BlogsID) REFERENCES Blogs(BlogsID) ON DELETE CASCADE,
+            created_at timestamp with time zone DEFAULT now(),
+            updated_at timestamp
         );
         
-        CREATE TABLE if not exists Clinics (
-          ClinicsID bigint primary key generated always as identity,
-          ClinicsName text NOT NULL,
-          ClinicsAddress text NOT NULL,
-          ClinicsNote bigint NOT NULL,
-          ClinicsOpenHr text NOT NULL,
-          created_at timestamp with time zone DEFAULT now(),
-          updated_at timestamp
+        Create TABLE if not exists ContactNumber (
+            ContactNumberID bigint primary key generated always as identity,
+            ContactNumber text NOT NULL,
+            ContactType text,
+            
+            HealthInstitutionID bigint NULL,
+            FinancialInstitutionID bigint NULL,
+            EventOrganizerID bigint NULL,
+            ClinicID bigint NULL,
+            
+            CONSTRAINT FK_HealthInstitution FOREIGN KEY (HealthInstitutionID) REFERENCES HealthInstitution(HealthInstitutionID) ON DELETE CASCADE,
+            CONSTRAINT FK_FinancialInstitution FOREIGN KEY (FinancialInstitutionID) REFERENCES FinancialInstitution(FinancialInstitutionID) ON DELETE CASCADE,
+            CONSTRAINT FK_Clinic FOREIGN KEY (ClinicID) REFERENCES Clinic(ClinicID) ON DELETE CASCADE,
+            CONSTRAINT FK_EventOrganizer FOREIGN KEY (EventOrganizerID) REFERENCES EventOrganizer(EventOrganizerID) ON DELETE CASCADE,
+            
+            created_at timestamp with time zone DEFAULT now(),
+            updated_at timestamp
         );
         
-        Create TABLE if not exists ContactNumbers (
-          ContactNumbersID bigint primary key generated always as identity,
-          Number text NOT NULL,
-          OwnerID bigint NOT NULL,
-          created_at timestamp with time zone DEFAULT now(),
-          updated_at timestamp
+        CREATE TABLE IF NOT EXISTS Journal (
+            JournalID BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+            JournalTitle TEXT NOT NULL,
+            JournalEmotion TEXT NOT NULL,
+            JournalContent TEXT NOT NULL,
+            created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+            updated_at TIMESTAMP
         );
-        
-        
+
+        CREATE TABLE IF NOT EXISTS JournalCategory (
+            JournalCategoryID BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+            JournalCategoryTag TEXT NOT NULL,
+            JournalID BIGINT NOT NULL,
+            FOREIGN KEY (JournalID) REFERENCES Journal(JournalID) ON DELETE CASCADE,
+            created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+            updated_at TIMESTAMP
+        );
+
+        CREATE TABLE IF NOT EXISTS Event (
+            EventID BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+            EventName TEXT NOT NULL,
+            EventDesc TEXT NOT NULL,
+            EventOrganizer TEXT NOT NULL,
+            created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+            updated_at TIMESTAMP
+        );
+
+        CREATE TABLE IF NOT EXISTS EventOrganizer (
+            EventOrganizerID BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+            EventOrganizerName TEXT NOT NULL,
+            EventID BIGINT NOT NULL,
+            FOREIGN KEY (EventID) REFERENCES Event(EventID) ON DELETE CASCADE,
+            created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+            updated_at TIMESTAMP
+        );
+
+        CREATE TABLE IF NOT EXISTS Clinic (
+            ClinicID BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+            ClinicName TEXT NOT NULL,
+            ClinicAddress TEXT NOT NULL,
+            ClinicNote TEXT,
+            ClinicOpenTime TEXT NOT NULL,
+            ClinicCloseTime TEXT NOT NULL,
+            created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+            updated_at TIMESTAMP
+        );
+
          """
 
     client.cursor.execute(Create_table_query)
@@ -170,6 +227,7 @@ def enableRLS():
     client.cursor.execute(enable_RLS)
     client.conn.commit()
     print("RLS(Row Level Security) enabled successfully");
+    client.cursor.close()
 
 def injectPolicies():
 
@@ -239,7 +297,8 @@ def dropTable():
     client.cursor.execute(deleteTableQuery)
     client.conn.commit()
     print("Table Delete successfully")
-
+    client.cursor.close()
+    
 def truncateTable():
     truncateQuery = """
     
@@ -338,12 +397,12 @@ def insertDummyData():
 # and ends when all the tasks in the group are successfully completed.
 # If any of the tasks fail, the transaction fails.
 
-def begin_transaction():
+# def begin_transaction():
 
-def commit_changes():
+# def commit_changes():
 
-def undo_changes():
+# def undo_changes():
 
-def set_Savepoint():
+# def set_Savepoint():
 
 
