@@ -1,5 +1,5 @@
 import client
-from Data.masterdata import health_institution, financial_institution
+# from data.masterdata import health_institution, financial_institution
 
 # Data Definition Language : commands, which are used to create,
 # alter, and delete database objects like tables, views, indexes,
@@ -10,7 +10,7 @@ def createTable():
     Create_table_query="""
         CREATE TABLE  if not exists HealthInstitution (
             HealthInstitutionID bigint primary key generated always as identity,
-            HealthInstitutionName text NOT NULL,
+            HealthInstitutionName text NOT NULL UNIQUE,
             HealthInstitutionDesc text NOT NULL,
             HealthInstitutionEmailAddress text NOT NULL,
             HealthInstitutionOpenTime text NOT NULL,
@@ -45,7 +45,7 @@ def createTable():
             
         CREATE TABLE if not exists FinancialInstitution (
             FinancialInstitutionID bigint primary key generated always as identity,
-            FinancialInstitutionName text NOT NULL,
+            FinancialInstitutionName text NOT NULL UNIQUE,
             FinancialInstitutionDesc text NOT NULL,
             FinancialInstitutionEmailAddress text NOT NULL,
             FinancialInstitutionOpenTime text NOT NULL,
@@ -59,9 +59,9 @@ def createTable():
         );
             
         CREATE TABLE if not exists FinancialInstitutionNote (
-            FinancialInstitutionNotesID bigint primary key generated always as identity,
-            FinancialInstitutionNotesName text NOT NULL,
-            FinancialInstitutionNotesDesc text NOT NULL,
+            FinancialInstitutionNoteID bigint primary key generated always as identity,
+            FinancialInstitutionNoteName text NOT NULL,
+            FinancialInstitutionNoteDesc text NOT NULL,
             FinancialInstitutionID bigint NOT NULL,
             FOREIGN KEY (FinancialInstitutionID) REFERENCES FinancialInstitution(FinancialInstitutionID) ON DELETE CASCADE,
             created_at timestamp with time zone DEFAULT now(),
@@ -69,9 +69,9 @@ def createTable():
         );
             
         CREATE TABLE if not exists FinancialInstitutionBenefit (
-            FinancialInstitutionBenefitsID bigint primary key generated always as identity,
-            FinancialInstitutionBenefitsName text NOT NULL,
-            FinancialInstitutionBenefitsDesc text NOT NULL,
+            FinancialInstitutionBenefitID bigint primary key generated always as identity,
+            FinancialInstitutionBenefitName text NOT NULL,
+            FinancialInstitutionBenefitDesc text NOT NULL,
             FinancialInstitutionID bigint NOT NULL,
             FOREIGN KEY (FinancialInstitutionID) REFERENCES FinancialInstitution(FinancialInstitutionID) ON DELETE CASCADE,
             created_at timestamp with time zone DEFAULT now(),
@@ -81,18 +81,18 @@ def createTable():
         CREATE TABLE if not exists FinancialInstitutionProcess (
             FinancialInstitutionProcessID bigint primary key generated always as identity,
             FinancialInstitutionProcessDesc text NOT NULL,
-            FinancialInstitutionBenefitsID bigint NOT NULL,
-            FOREIGN KEY (FinancialInstitutionBenefitsID) REFERENCES FinancialInstitutionBenefits(FinancialInstitutionBenefitsID) ON DELETE CASCADE,
+            FinancialInstitutionBenefitID bigint NOT NULL,
+            FOREIGN KEY (FinancialInstitutionBenefitID) REFERENCES FinancialInstitutionBenefit(FinancialInstitutionBenefitID) ON DELETE CASCADE,
             created_at timestamp with time zone DEFAULT now(),
             updated_at timestamp
         );
             
-        CREATE TABLE if not exists BenefitsInclusionList (
-            BenefitsInclusionListID bigint primary key generated always as identity,
-            BenefitsInclusionListTitle text NOT NULL,
-            BenefitsInclusionListDesc text NOT NULL,
-            FinancialInstitutionBenefitsID bigint NOT NULL,
-            FOREIGN KEY (FinancialInstitutionBenefitsID) REFERENCES FinancialInstitutionBenefits(FinancialInstitutionBenefitsID) ON DELETE CASCADE,
+        CREATE TABLE if not exists BenefitInclusion (
+            BenefitInclusionID bigint primary key generated always as identity,
+            BenefitInclusionTitle text NOT NULL,
+            BenefitInclusionDesc text NOT NULL,
+            FinancialInstitutionBenefitID bigint NOT NULL,
+            FOREIGN KEY (FinancialInstitutionBenefitID) REFERENCES FinancialInstitutionBenefit(FinancialInstitutionBenefitID) ON DELETE CASCADE,
             created_at timestamp with time zone DEFAULT now(),
             updated_at timestamp
         );
@@ -102,8 +102,8 @@ def createTable():
             FinancialInstitutionRequirementName text NOT NULL,
             FinancialInstitutionRequirementDesc text NOT NULL,
             FinancialInstitutionRequirementType text NOT NULL,
-            FinancialInstitutionBenefitsID bigint NOT NULL,
-            FOREIGN KEY (FinancialInstitutionBenefitsID) REFERENCES FinancialInstitutionBenefits(FinancialInstitutionBenefitsID) ON DELETE CASCADE,
+            FinancialInstitutionBenefitID bigint NOT NULL,
+            FOREIGN KEY (FinancialInstitutionBenefitID) REFERENCES FinancialInstitutionBenefit(FinancialInstitutionBenefitID) ON DELETE CASCADE,
             created_at timestamp with time zone DEFAULT now(),
             updated_at timestamp
         );
@@ -125,30 +125,34 @@ def createTable():
             updated_at timestamp
         );
         
-        Create TABLE if not exists ContactNumber (
-            ContactNumberID bigint primary key generated always as identity,
-            ContactNumber text NOT NULL,
-            ContactType text,
-            
-            HealthInstitutionID bigint NULL,
-            FinancialInstitutionID bigint NULL,
-            EventOrganizerID bigint NULL,
-            ClinicID bigint NULL,
-            
-            CHECK (
-                (HealthInstitutionID IS NOT NULL)::int +
-                (FinancialInstitutionID IS NOT NULL)::int +
-                (EventOrganizerID IS NOT NULL)::int +
-                (ClinicID IS NOT NULL)::int = 1
-            ),
-            
-            CONSTRAINT FK_HealthInstitution FOREIGN KEY (HealthInstitutionID) REFERENCES HealthInstitution(HealthInstitutionID) ON DELETE CASCADE,
-            CONSTRAINT FK_FinancialInstitution FOREIGN KEY (FinancialInstitutionID) REFERENCES FinancialInstitution(FinancialInstitutionID) ON DELETE CASCADE,
-            CONSTRAINT FK_Clinic FOREIGN KEY (ClinicID) REFERENCES Clinic(ClinicID) ON DELETE CASCADE,
-            CONSTRAINT FK_EventOrganizer FOREIGN KEY (EventOrganizerID) REFERENCES EventOrganizer(EventOrganizerID) ON DELETE CASCADE,
-            
-            created_at timestamp with time zone DEFAULT now(),
-            updated_at timestamp
+        CREATE TABLE IF NOT EXISTS Clinic (
+            ClinicID BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+            ClinicName TEXT NOT NULL UNIQUE,
+            ClinicAddress TEXT NOT NULL,
+            ClinicNote TEXT,
+            ClinicOpenTime TEXT NOT NULL,
+            ClinicCloseTime TEXT NOT NULL,
+            created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+            updated_at TIMESTAMP
+        );
+        
+        
+        CREATE TABLE IF NOT EXISTS Event (
+            EventID BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+            EventName TEXT NOT NULL,
+            EventDesc TEXT NOT NULL,
+            EventOrganizer TEXT NOT NULL,
+            created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+            updated_at TIMESTAMP
+        );
+
+        CREATE TABLE IF NOT EXISTS EventOrganizer (
+            EventOrganizerID BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+            EventOrganizerName TEXT NOT NULL,
+            EventID BIGINT NOT NULL,
+            FOREIGN KEY (EventID) REFERENCES Event(EventID) ON DELETE CASCADE,
+            created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+            updated_at TIMESTAMP
         );
         
         CREATE TABLE IF NOT EXISTS Journal (
@@ -168,43 +172,39 @@ def createTable():
             created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
             updated_at TIMESTAMP
         );
-
-        CREATE TABLE IF NOT EXISTS Event (
-            EventID BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-            EventName TEXT NOT NULL,
-            EventDesc TEXT NOT NULL,
-            EventOrganizer TEXT NOT NULL,
-            created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-            updated_at TIMESTAMP
+        
+        Create TABLE if not exists ContactNumber (
+            ContactNumberID bigint primary key generated always as identity,
+            ContactNumber text NOT NULL,
+            ContactType text,
+            
+            HealthInstitutionID bigint NULL,
+            FinancialInstitutionID bigint NULL,
+            EventOrganizerID bigint NULL,
+            ClinicID bigint NULL,
+            
+            CHECK (
+                (HealthInstitutionID IS NOT NULL)::int +
+                (FinancialInstitutionID IS NOT NULL)::int +
+                (EventOrganizerID IS NOT NULL)::int +
+                (ClinicID IS NOT NULL)::int = 1
+            ),
+            
+            CONSTRAINT FK_HealthInstitution FOREIGN KEY (HealthInstitutionID) REFERENCES HealthInstitution(HealthInstitutionID) ON DELETE CASCADE,
+            CONSTRAINT FK_FinancialInstitution FOREIGN KEY (FinancialInstitutionID) REFERENCES FinancialInstitution(FinancialInstitutionID) ON DELETE CASCADE,
+            CONSTRAINT FK_Clinic FOREIGN KEY (ClinicID) REFERENCES Clinic(ClinicID) ON DELETE RESTRICT,
+            CONSTRAINT FK_EventOrganizer FOREIGN KEY (EventOrganizerID) REFERENCES EventOrganizer(EventOrganizerID) ON DELETE CASCADE,
+            
+            created_at timestamp with time zone DEFAULT now(),
+            updated_at timestamp
         );
-
-        CREATE TABLE IF NOT EXISTS EventOrganizer (
-            EventOrganizerID BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-            EventOrganizerName TEXT NOT NULL,
-            EventID BIGINT NOT NULL,
-            FOREIGN KEY (EventID) REFERENCES Event(EventID) ON DELETE CASCADE,
-            created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-            updated_at TIMESTAMP
-        );
-
-        CREATE TABLE IF NOT EXISTS Clinic (
-            ClinicID BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-            ClinicName TEXT NOT NULL,
-            ClinicAddress TEXT NOT NULL,
-            ClinicNote TEXT,
-            ClinicOpenTime TEXT NOT NULL,
-            ClinicCloseTime TEXT NOT NULL,
-            created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-            updated_at TIMESTAMP
-        );
-
-         """
+        
+        """
 
     client.cursor.execute(Create_table_query)
 
     client.conn.commit()
     print("created table successfully")
-    client.cursor.close()
 
 def enableRLS():
 
@@ -223,12 +223,14 @@ def enableRLS():
     ALTER TABLE FinancialInstitutionNote ENABLE ROW LEVEL SECURITY;
     ALTER TABLE FinancialInstitutionBenefit ENABLE ROW LEVEL SECURITY;
     ALTER TABLE FinancialInstitutionProcess ENABLE ROW LEVEL SECURITY;
-    ALTER TABLE BenefitsInclusionList ENABLE ROW LEVEL SECURITY;
+    ALTER TABLE BenefitInclusion ENABLE ROW LEVEL SECURITY;
     ALTER TABLE FinancialInstitutionRequirement ENABLE ROW LEVEL SECURITY;
     ALTER TABLE Blog ENABLE ROW LEVEL SECURITY;
     ALTER TABLE BlogRefLink ENABLE ROW LEVEL SECURITY;
     ALTER TABLE Clinic ENABLE ROW LEVEL SECURITY;
     ALTER TABLE ContactNumber ENABLE ROW LEVEL SECURITY;
+    ALTER TABLE Journal ENABLE ROW LEVEL SECURITY;
+    ALTER TABLE JournalCategory ENABLE ROW LEVEL SECURITY;
     ALTER TABLE Event ENABLE ROW LEVEL SECURITY;
     ALTER TABLE EventOrganizer ENABLE ROW LEVEL SECURITY;
     """
@@ -236,7 +238,6 @@ def enableRLS():
     client.cursor.execute(enable_RLS)
     client.conn.commit()
     print("RLS(Row Level Security) enabled successfully");
-    client.cursor.close()
 
 def injectPolicies():
 
@@ -294,11 +295,11 @@ def injectPolicies():
     CREATE POLICY full_FinancialInstitutionRequirement_update ON FinancialInstitutionRequirement FOR UPDATE USING (true);
     CREATE POLICY full_FinancialInstitutionRequirement_delete ON FinancialInstitutionRequirement FOR DELETE USING (true);
 
-    -- Allow all users to SELECT, INSERT, UPDATE, DELETE on BenefitsInclusionList
-    CREATE POLICY full_BenefitsInclusionList_select ON BenefitsInclusionList FOR SELECT USING (true);
-    CREATE POLICY full_BenefitsInclusionList_insert ON BenefitsInclusionList FOR INSERT WITH CHECK (true);
-    CREATE POLICY full_BenefitsInclusionList_update ON BenefitsInclusionList FOR UPDATE USING (true);
-    CREATE POLICY full_BenefitsInclusionList_delete ON BenefitsInclusionList FOR DELETE USING (true);
+    -- Allow all users to SELECT, INSERT, UPDATE, DELETE on BenefitInclusion
+    CREATE POLICY full_BenefitInclusion_select ON BenefitInclusion FOR SELECT USING (true);
+    CREATE POLICY full_BenefitInclusion_insert ON BenefitInclusion FOR INSERT WITH CHECK (true);
+    CREATE POLICY full_BenefitInclusion_update ON BenefitInclusion FOR UPDATE USING (true);
+    CREATE POLICY full_BenefitInclusion_delete ON BenefitInclusion FOR DELETE USING (true);
 
     -- Allow all users to SELECT, INSERT, UPDATE, DELETE on Blog
     CREATE POLICY full_Blog_select ON Blog FOR SELECT USING (true);
@@ -356,19 +357,23 @@ def injectPolicies():
 
 def dropTable():
     deleteTableQuery="""
-     DROP TABLE HealthInstitution;
-     DROP TABLE HealthInstitutionService;
-     DROP TABLE HealthInstitutionAcreditedInsurance;
-     DROP TABLE FinancialInstitution;
-     DROP TABLE FinancialInstitutionNote;
-     DROP TABLE FinancialInstitutionBenefit;
-     DROP TABLE FinancialInstitutionProcess;
-     DROP TABLE BenefitsInclusionList;
-     DROP TABLE FinancialInstitutionRequirement;
-     DROP TABLE Blog;
-     DROP TABLE BlogRefLink;
-     DROP TABLE Clinic;
-     DROP TABLE ContactNumber;
+        DROP TABLE IF EXISTS BlogRefLink CASCADE;
+        DROP TABLE IF EXISTS JournalCategory CASCADE;
+        DROP TABLE IF EXISTS EventOrganizer CASCADE;
+        DROP TABLE IF EXISTS ContactNumber CASCADE;
+        DROP TABLE IF EXISTS BenefitInclusion CASCADE;
+        DROP TABLE IF EXISTS FinancialInstitutionProcess CASCADE;
+        DROP TABLE IF EXISTS FinancialInstitutionBenefit CASCADE;
+        DROP TABLE IF EXISTS FinancialInstitutionNote CASCADE;
+        DROP TABLE IF EXISTS FinancialInstitutionRequirement CASCADE;
+        DROP TABLE IF EXISTS HealthInstitutionService CASCADE;
+        DROP TABLE IF EXISTS HealthInstitutionAcreditedInsurance CASCADE;
+        DROP TABLE IF EXISTS Clinic CASCADE;
+        DROP TABLE IF EXISTS Event CASCADE;
+        DROP TABLE IF EXISTS Journal CASCADE;
+        DROP TABLE IF EXISTS Blog CASCADE;
+        DROP TABLE IF EXISTS FinancialInstitution CASCADE;
+        DROP TABLE IF EXISTS HealthInstitution CASCADE;
     """
 
     client.cursor.execute(deleteTableQuery)
@@ -387,88 +392,6 @@ def truncateTable():
 # with descriptions of the database schema and is used to create and modify
 # the structure of database objects in the database
 
-def insertDummyData():
-    try:
-        InsertHealthInstitution= """    
-        INSERT INTO healthinstitution (
-            healthinstitutionname,
-            healthinstitutiondesc,
-            healthinstitutionemailaddress,
-            healthinstitutionopentime,
-            healthinstitutiontype,
-            healthinstitutionaddress,
-            healthinstitutionaddressLong,
-            healthinstitutionaddressLat,
-            created_at
-        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW())
-        ON CONFLICT (healthinstitutionname) 
-        DO UPDATE SET
-            healthinstitutiondesc = EXCLUDED.healthinstitutiondesc,
-            healthinstitutionemailaddress = EXCLUDED.healthinstitutionemailaddress,
-            healthinstitutionopentime = EXCLUDED.healthinstitutionopentime,
-            healthinstitutiontype = EXCLUDED.healthinstitutiontype,
-            healthinstitutionaddress = EXCLUDED.healthinstitutionaddress,
-            healthinstitutionaddressLong = EXCLUDED.healthinstitutionaddressLong,
-            healthinstitutionaddressLat = EXCLUDED.healthinstitutionaddressLat,
-            updated_at = NOW();
-        """
-        for institution in health_institution:
-            client.cursor.execute(InsertHealthInstitution, (
-                institution["HealthInstitutionName"],
-                institution["HealthInstitutionDesc"],
-                institution["HealthInstitutionEmailAddress"],
-                institution["HealthInstitutionOpenTime"],
-                institution["HealthInstitutionType"],
-                institution["HealthInstitutionAddress"],
-                institution["HealthInstitutionAddressLong"],
-                institution["HealthInstitutionAddressLat"]
-            ))
-
-        InsertFinancialInstitution = """    
-                INSERT INTO financialinstitution (
-                    financialinstitutionname,
-                    FinancialInstitutionDesc,
-                    FinancialInstitutionEmailAddress,
-                    FinancialInstitutionOpenTime,
-                    FinancialInstitutionType,
-                    FinancialInstitutionAddress,
-                    FinancialInstitutionAddressLong,
-                    FinancialInstitutionAddressLat,
-                    created_at
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW())
-                ON CONFLICT (financialinstitutionname) 
-                DO UPDATE SET
-                    FinancialInstitutionName = EXCLUDED.FinancialInstitutionName,
-                    FinancialInstitutionDesc = EXCLUDED.FinancialInstitutionDesc,
-                    FinancialInstitutionEmailAddress = EXCLUDED.FinancialInstitutionEmailAddress,
-                    FinancialInstitutionOpenTime= EXCLUDED.FinancialInstitutionOpenTime,
-                    FinancialInstitutionType= EXCLUDED.FinancialInstitutionType,
-                    FinancialInstitutionAddress= EXCLUDED.FinancialInstitutionAddress,
-                    FinancialInstitutionAddressLong= EXCLUDED.FinancialInstitutionAddressLong,
-                    FinancialInstitutionAddressLat= EXCLUDED.FinancialInstitutionAddressLat,
-                    updated_at = NOW();
-                """
-        for institution in financial_institution:
-            client.cursor.execute(InsertFinancialInstitution, (
-                institution["FinancialInstitutionName"],
-                institution["FinancialInstitutionDesc"],
-                institution["FinancialInstitutionEmailAddress"],
-                institution["FinancialInstitutionOpenTime"],
-                institution["FinancialInstitutionType"],
-                institution["FinancialInstitutionAddress"],
-                institution["FinancialInstitutionAddressLong"],
-                institution["FinancialInstitutionAddressLat"]
-            ))
-
-        # Add here
-
-        client.conn.commit()
-        print("Insert master data successfully")
-        client.conn.close()
-    except Exception as e:
-        print(e)
-
-
 # Transaction Control Language: Transactions group a set of tasks into
 # a single execution unit. Each transaction begins with a specific task
 # and ends when all the tasks in the group are successfully completed.
@@ -482,4 +405,7 @@ def insertDummyData():
 
 # def set_Savepoint():
 
-
+# createTable();
+# enableRLS();
+# injectPolicies();
+# dropTable();

@@ -3,9 +3,6 @@ from colorama import Fore, Style, init
 # Initialize colorama for Windows compatibility
 init(autoreset=True)
 
-
-
-
 def show_menu():
     print(Fore.RED + r"""
        _____                                        _        _                     _____   _        _____ 
@@ -27,7 +24,5 @@ def show_menu():
     """ + Fore.CYAN + """
     ===========================================
     """ + Fore.YELLOW)
-
-
 
 show_menu()
